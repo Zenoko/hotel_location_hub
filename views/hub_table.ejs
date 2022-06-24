@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Accor Hotel Hub Locator</title>
+		
+		<!-- Bootstrap core CSS -->
+		<link href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css" rel="stylesheet"  crossorigin="anonymous">
+		<link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		
+		<style>
+			.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+			}
+			
+			@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+			font-size: 3.5rem;
+			}
+			}
+			
+			#map{ /* la carte DOIT avoir une hauteur sinon elle n'apparaît pas */
+			height:370px;
+			width:500px;
+			}
+			
+			form{
+			width:100%;
+			}
+			
+			a{
+			color:white;
+			}
+			
+			a:link { text-decoration: none; }		
+			a:visited { text-decoration: none; }		
+			a:hover { text-decoration: none; }	
+			a:active { text-decoration: none; }
+			
+			td{
+			font-size:10px;
+			}
+			
+			#ExcelButton{
+			margin : 5px;
+			background-color:#10793F;
+			color : white;
+			}
+			
+		</style>
+		
+		<!-- Custom styles for this template -->
+		<link rel="stylesheet" type="text/css" href="/styles/dashboard.css" />
+	</head>
+	<body>
+		
+		<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Accor Hotel Hub Locator</a>
+			<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="navbar-nav">
+				<div class="nav-item text-nowrap">
+					<a class="nav-link px-3" href="#" disabled>Sign out</a>
+				</div>
+			</div>
+		</header>
+		
+		<div class="container-fluid">
+			<div class="row">
+				<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+					<div class="position-sticky pt-3">
+						<ul class="nav flex-column">
+							<li class="nav-item">
+								<a class="nav-link " href="/find_hub_hotel">
+									<span data-feather="map-pin"></span>
+									Map Locator
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link active" aria-current="page" href="/find_hub_table">
+									<span data-feather="database"></span>
+									Hub Table
+								</a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+				
+				<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+					<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+						<h1 class="h2">Tableau Hotel / Hub </h1>
+					</div>
+					<!-- <h2>Section title</h2> -->
+					<div class="table-responsive">
+						<table class="table table-sm table-dark table-hover" id="example">
+							<thead class="table-dark">
+								<tr>
+									<th scope="col" class="text-center">N°</th>
+									<th scope="col" class="text-center">Name</th>
+									<th scope="col" class="text-center">Country</th>
+									<th scope="col" class="text-center">Hub</th>
+									<th scope="col" class="text-center">Mail</th>
+									<th scope="col" class="text-center">Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% hotels.forEach(function (hotel) { %>
+								<tr class="align-middle">
+									<td class="text-center fw-bold"><%= hotel.hotelCode %></td>
+									<td class=""><%= hotel.hotelName %></td>
+									<td class="text-center"><%= hotel.countryName %> [<%= hotel.countryCode %>]</td>
+									<% if (southEuropeCountry.includes(hotel.countryCode[0])) { %>
+									<td class=" text-center fw-bold" style="background-color:#0d6efd;">South Europe [SE]</td>
+									<td class=""><a href = "mailto: accor_loading_escalation@everience.com">accor_loading_escalation@everience.com</a></td>
+									<% } else if (northAmericaCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#dc3545;">North America [NCA]</td>
+									<td class=""><a href = "mailto: NCA.Distributionsupport@accor.com">NCA.Distributionsupport@accor.com</a></td>
+									<% } else if (southAmericaCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#fd7e14;">South America [SAM]</td>
+									<td class=""><a href = "mailto: DistributionTeam@accor.com">DistributionTeam@accor.com</a></td>
+									<% } else if (northEuropeCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#6610f2;">North Europe [NE]</td>
+									<td class=""><a href = "mailto: accor_loading_escalation@everience.com">accor_loading_escalation@everience.com</a></td>
+									<% } else if (southEastAsiaCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#198754;">South East Asia [SEA]</td>
+									<td class=""><a href = "mailto: SEA.DATA.ADMINISTRATION@accor.com">SEA.DATA.ADMINISTRATION@accor.com</a></td>
+									<% } else if (chinaCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#f8f9fa; color:black;">China</td>
+									<td class=""><a href = "mailto: CHINA.SERVICEDESK@accor.com">CHINA.SERVICEDESK@accor.com</a></td>
+									<% } else if (pacificCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#0dcaf0;">Pacific</td>
+									<td class=""><a href = "mailto: DISTRIBUTION.PACIFIC@accor.com ">DISTRIBUTION.PACIFIC@accor.com</a></td>
+									<% } else if (imeaCountry.includes(hotel.countryCode[0])){%>
+									<td class="text-center fw-bold" style="background-color:#ffc107; color:black;">India MiddleEast Africa Turkey [IMEA]</td>
+									<td class=""><a href = "mailto: meait.smdl@accor.com ">meait.smdl@accor.com</a></td>
+									<% } else{%>
+									<td class="table-secondary text-center">Hub à renseigner !</td>
+									<td class=""></td>
+									<% } %>
+									<td ><%= hotel.hotelStatus %></td>
+								
+							<!--<td ><button type="button" class="btn btn-danger btn-sm disabled""><span data-feather="trash"></span></button>
+								<button type="button" class="btn btn-success btn-sm disabled"><span data-feather="plus"></span></button>
+							<button type="button" class="btn btn-warning btn-sm disabled"><span data-feather="edit"></span></button></td>-->
+						</tr>
+						<% }) %>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th scope="col"class="text-center">N°</th>
+								<th scope="col"class="text-center">Name</th>
+								<th scope="col"class="text-center">Country</th>
+								<th scope="col"class="text-center">Hub</th>
+								<th scope="col"class="text-center">Mail</th>
+								<th scope="col"class="text-center">Status</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</main>
+		</div>
+	</div>
+	
+	<script src="https://code.jquery.com/jquery-3.5.1.js" crossorigin="anonymous"></script>	
+	<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js" crossorigin="anonymous"></script>	
+	
+	<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.bootstrap5.min.js" crossorigin="anonymous"></script>
+	
+	
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js" crossorigin="anonymous"></script>
+	
+	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>	
+	<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
+	<script src="/scripts/dashboard.js"></script>
+	<script>
+		$(document).ready(function () {
+		var table = $('#example').DataTable( {
+		dom: 'Blfrtip',
+		buttons: [{
+		extend: 'excel',
+		className: "btn btn-primary",
+		text: 'Export Excel',
+		}],
+		"lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ]
+		} );
+		
+		table.buttons().container()
+		.appendTo( '#example_wrapper .col-md-6:eq(0)' );
+		});
+	</script>
+</body>
+</html>

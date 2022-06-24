@@ -1,0 +1,35 @@
+{
+  "name": "geolocation_hotel_hub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node",
+    "watch": "nodemon --ext *"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "bootstrap-select": "^1.13.18",
+    "daemon": "^1.1.0",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-xml-bodyparser": "^0.3.0",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "jszip": "^3.10.0",
+    "node-geocoder": "^4.0.0",
+    "node-xml-stream": "^1.0.2",
+    "pug": "^3.0.2",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.27.10",
+    "connect-livereload": "^0.6.1",
+    "livereload": "^0.9.3",
+    "nodemon": "^2.0.16"
+  }
+}

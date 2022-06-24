@@ -1,0 +1,214 @@
+<html>
+	<head>
+		<title>Hub Hotel Map</title>
+		<!-- CSS only -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+		
+		<script src="https://maps.google.com/maps/api/js?key=AIzaSyC1JGhGevrLvdWjHDKVJXG436XUOHwOEGA" type="text/javascript"></script>
+		<script async type="text/javascript">
+			// On initialise la latitude et la longitude
+			var lat = <%= infoGeo[0].latitude %>;
+			var lon = <%= infoGeo[0].longitude %>;
+			var map = null;
+			// Fonction d'initialisation de la carte
+			function initMap() {
+			// Créer l'objet "map" et l'insèrer dans l'élément HTML qui a l'ID "map"
+			map = new google.maps.Map(document.getElementById("map"), {
+				center: {lat: 36.0996987, lng: -341.8203554},
+				zoom: 1,
+				styles: [
+				{elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+				{elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+				{elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+				{
+					featureType: 'administrative.locality',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#d59563'}]
+				},
+				{
+					featureType: 'poi',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#d59563'}]
+				},
+				{
+					featureType: 'poi.park',
+					elementType: 'geometry',
+					stylers: [{color: '#263c3f'}]
+				},
+				{
+					featureType: 'poi.park',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#6b9a76'}]
+				},
+				{
+					featureType: 'road',
+					elementType: 'geometry',
+					stylers: [{color: '#38414e'}]
+				},
+				{
+					featureType: 'road',
+					elementType: 'geometry.stroke',
+					stylers: [{color: '#212a37'}]
+				},
+				{
+					featureType: 'road',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#9ca5b3'}]
+				},
+				{
+					featureType: 'road.highway',
+					elementType: 'geometry',
+					stylers: [{color: '#746855'}]
+				},
+				{
+					featureType: 'road.highway',
+					elementType: 'geometry.stroke',
+					stylers: [{color: '#1f2835'}]
+				},
+				{
+					featureType: 'road.highway',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#f3d19c'}]
+				},
+				{
+					featureType: 'transit',
+					elementType: 'geometry',
+					stylers: [{color: '#2f3948'}]
+				},
+				{
+					featureType: 'transit.station',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#d59563'}]
+				},
+				{
+					featureType: 'water',
+					elementType: 'geometry',
+					stylers: [{color: '#17263c'}]
+				},
+				{
+					featureType: 'water',
+					elementType: 'labels.text.fill',
+					stylers: [{color: '#515c6d'}]
+				},
+				{
+					featureType: 'water',
+					elementType: 'labels.text.stroke',
+					stylers: [{color: '#17263c'}]
+				}
+				]
+			});
+			
+			// Nous ajoutons un marqueur pour le centre de la zone europe du sud
+			var marker = new google.maps.Marker({
+				// Nous définissons sa position (syntaxe json)
+				position: {lat: lat, lng: lon},
+				// Nous définissons à quelle carte il est ajouté
+				map: map
+			});
+			
+			<!-- Dessiner des zones de couleurs -->
+			
+			//sommets du polygone
+			var southEuropePolygone = [
+		<!-- new google.maps.LatLng(48.858859 , 2.3470599), // Paris -->
+		
+		new google.maps.LatLng(52.9584849, 4.8925826),
+		new google.maps.LatLng(48.2822846, -4.8632768),
+		new google.maps.LatLng(43.1351761, -1.5234330),
+		new google.maps.LatLng(43.2632427, -9.4335893),
+		new google.maps.LatLng(36.8857140, -9.2578080),
+		new google.maps.LatLng(36.8857140, -1.3476518),
+		new google.maps.LatLng(43.1992430, 4.3652388),
+		new google.maps.LatLng(43.1351761, 7.3535201),
+		new google.maps.LatLng(38.7589554, 8.1445357),
+		new google.maps.LatLng(36.4630079, 15.7031295),
+		new google.maps.LatLng(40.1156905, 18.8671920),
+		new google.maps.LatLng(45.3992021, 12.6269576),
+		new google.maps.LatLng(53.0113667, 5.3320357),
+		
+		];
+		
+		//sommets du polygone
+		var northAmericaPolygone = [
+		<!-- new google.maps.LatLng(48.858859 , 2.3470599), // Paris -->
+		
+		new google.maps.LatLng(9.6856554, -77.3437929),
+		new google.maps.LatLng(69.1048637, -19.6875429),
+		new google.maps.LatLng(83.4173764, -16.8750429),
+		new google.maps.LatLng(83.1712357, -81.5625429),
+		new google.maps.LatLng(66.7294397, -165.9375429),
+		new google.maps.LatLng(56.4790861, -156.7969179),
+		new google.maps.LatLng(59.81390640, -143.4375429),
+		new google.maps.LatLng(18.5354359, -107.5781679),
+		new google.maps.LatLng(8.2975241, -78.7500429),
+		];
+		
+		se = new google.maps.Polygon({
+			paths: southEuropePolygone, // sommets du polygone
+			strokeColor: "#d35400", // couleur des bords du	polygone
+			strokeOpacity: 0.8, // opacité des bords du	polygone
+			strokeWeight: 2, // épaisseur des bords du	polygone
+			fillColor: "##f39c12", // couleur de remplissage du	polygone
+			fillOpacity: 0.35, // opacité de remplissage du	polygone
+			title: "name"
+		});
+		
+		na = new google.maps.Polygon({
+			paths: northAmericaPolygone, // sommets du polygone
+			strokeColor: "#d35400", // couleur des bords du	polygone
+			strokeOpacity: 0.8, // opacité des bords du	polygone
+			strokeWeight: 2, // épaisseur des bords du	polygone
+			fillColor: "##f39c12", // couleur de remplissage du	polygone
+			fillOpacity: 0.35, // opacité de remplissage du	polygone
+			title: "name"
+		});
+		
+		//lier le polygone à la carte
+		//ceci permet au polygone d'être affiché sur la carte
+		se.setMap(map);
+		na.setMap(map);
+		
+}
+window.onload = function(){
+	// Fonction d'initialisation qui s'exécute lorsque le DOM est chargé
+	initMap(); 
+};
+</script>
+<style type="text/css">
+	#map{ /* la carte DOIT avoir une hauteur sinon elle n'apparaît pas */
+	height:370px;
+	width:500px;
+	}
+</style>
+</head>
+<body>
+	<% if (locals.hotelCode) { %>
+		<h1><%= hotelCode %></h1>
+	<% } %>
+	
+	<form action="/searchHubHotel" method="post">
+		<label for="hotelCode">Enter Hotel Code: </label>
+		<input id="hotelCode" type="text" name="hotel_code" placeholder="Hotel Code">
+		<input type="submit" value="OK">
+	</form>
+	
+	<ul>		
+		<li>
+			<strong><%= infoGeo[0].latitude %></strong>
+		</li>
+		<li>
+			<strong><%= infoGeo[0].longitude %></strong>
+		</li>
+		<li>
+			<strong><%= infoGeo[0].country %></strong>
+		</li>
+	</ul>
+	
+	<div id="map">
+		<!-- Ici s'affichera la carte -->
+	</div>
+	
+	<!-- JavaScript Bundle with Popper -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>

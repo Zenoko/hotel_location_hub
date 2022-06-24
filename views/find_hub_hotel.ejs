@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Accor Hotel Hub Locator</title>
+		
+		<!-- Bootstrap core CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+		
+		<style>
+			.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+			}
+			
+			@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+			font-size: 3.5rem;
+			}
+			}
+			
+			#map{ /* la carte DOIT avoir une hauteur sinon elle n'apparaît pas */
+			height:370px;
+			width:500px;
+			}
+			
+			form{
+			width:100%;
+			}
+		</style>
+		
+		<!-- Custom styles for this template -->
+		<link rel="stylesheet" type="text/css" href="/styles/dashboard.css" />
+	</head>
+	<body>	
+		<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Accor Hotel Hub Locator</a>
+			<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<form action="/find_hub_hotel" method="post">
+				<input class="form-control form-control-dark w-100" list="datalistOptions" id="hotelCode" name="hotel_code" placeholder="Enter Hotel Code*" aria-label="Search" pattern="^(<% hotels.forEach(function (hotel) { %><%= hotel.hotelCode %>|<% }) %>)$">
+				<datalist id="datalistOptions">
+					<% hotels.forEach(function (hotel) { %>
+					<option value="<%= hotel.hotelCode %>"></option>
+					<% }) %>
+				</datalist>
+			</form>
+			<div class="navbar-nav">
+				<div class="nav-item text-nowrap">
+					<a class="nav-link px-3 disabled" href="#">Sign on</a>
+				</div>
+			</div>
+		</header>
+		
+		<div class="container-fluid">
+			<div class="row">
+				<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+					<div class="position-sticky pt-3">
+						<ul class="nav flex-column">
+							<li class="nav-item">
+								<a class="nav-link active" aria-current="page" href="/find_hub_hotel">
+									<span data-feather="map-pin"></span>
+									Map Locator
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/find_hub_table">
+									<span data-feather="database"></span>
+									Hub Table
+								</a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+				
+				<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+					<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+						<% if (!locals.messageErreur) { %>
+						<% if (locals.hotelInfo) { %>
+						<h1 class="h2">Hotel <%= hotelInfo.hotelCode %> - <%= hotelInfo.hotelName %></h1>
+						<% } %>
+						<% } else{%>
+						<h1 class="h2"><%= messageErreur %></h1>
+						<% } %>
+					</div>
+					
+					<div class="row">
+						<div class="col-md-6 col-lg-6">
+							<div id="map">
+								<!-- Ici s'affichera la carte -->
+							</div>
+						</div>
+						<div class="col-md-6 col-lg-6">
+							<div class="row">
+								<% if (locals.hotelInfo) { %>
+									<h5>Information Hotel : </h5>
+									<ul>
+										<li>Name : <%= hotelInfo.hotelName %></li>
+										<% if(hotelInfo.longitude!=null || hotelInfo.latitude!=null){%>
+										<li>Longitude : <%= hotelInfo.longitude %></li>
+										<li>Latitude : <%= hotelInfo.latitude %></li>
+										<%} else{%>
+										<li style="color:red;">Pas de coordonnées GPS données - Pas de localisation possible</li>
+										<%}%>
+										<li>Brand Name : <%= hotelInfo.brandName %></li>
+										<li>City : <%= hotelInfo.cityName %></li>
+										<li>Country : <%= hotelInfo.countryName %></li>
+										<li>Status : <%= hotelInfo.hotelStatus %></li>
+									</ul>
+									
+									<% if (locals.hotelInfo && locals.southEuropeCountry && southEuropeCountry.includes(hotelInfo.countryCode[0])) { %>
+									<h6>Hub Europe du Sud : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #0d6efd; background-color:rgba(13, 110, 253,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: accor_loading_escalation@everience.com">accor_loading_escalation@everience.com</a></div>
+									<% } else if (locals.hotelInfo && locals.northAmericaCountry && northAmericaCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub Amérique du Nord : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #dc3545;background-color:rgba(220, 53, 69,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: NCA.Distributionsupport@accor.com">NCA.Distributionsupport@accor.com</a></div>
+									<% } else if (locals.hotelInfo && locals.southAmericaCountry && southAmericaCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub Amérique du Sud : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #fd7e14;background-color:rgba(253, 126, 20,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: DistributionTeam@accor.com">DistributionTeam@accor.com</a></div>
+									<% } else if (locals.hotelInfo && locals.northEuropeCountry && northEuropeCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub Europe du Nord : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #6610f2;background-color:rgba(102, 16, 242,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: accor_loading_escalation@everience.com">accor_loading_escalation@everience.com</a></div>
+									<% } else if (locals.hotelInfo && locals.southEastAsiaCountry && southEastAsiaCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub Asie du Sud/Est : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #198754;background-color:rgba(25, 135, 84,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: SEA.DATA.ADMINISTRATION@accor.com">SEA.DATA.ADMINISTRATION@accor.com</a></div>
+									<% } else if (locals.hotelInfo && locals.chinaCountry && chinaCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub Chine : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #f8f9fa;background-color:rgba(248, 249, 250,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: CHINA.SERVICEDESK@accor.com">CHINA.SERVICEDESK@accor.com</a></div>
+									<% } else if (locals.hotelInfo && locals.pacificCountry && pacificCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub Pacific : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #0dcaf0;background-color:rgba(13, 202, 240,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: DISTRIBUTION.PACIFIC@accor.com">DISTRIBUTION.PACIFIC@accor.com</a></div>
+									<% } else if (locals.hotelInfo && locals.imeaCountry && imeaCountry.includes(hotelInfo.countryCode[0])){%>
+									<h6>Hub IMEA : </h6>
+									<div class="col-md-6 col-lg-6" style="width: 20px; height: 20px; border-radius: 40px;border-style: solid; border-color: #ffc107;background-color:rgba(255, 193, 7,0.2);"></div>
+									<div class="col-md-6 col-lg-6"><a href = "mailto: meait.smdl@accor.com">meait.smdl@accor.com</a></div>
+									<% } else{%>
+									
+									<% }%>
+								<% } %>
+							</div>
+						</div>
+					</div>
+				</main>
+			</div>
+		</div>
+		<script src="https://code.jquery.com/jquery-3.5.1.js" crossorigin="anonymous"></script>	
+		<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
+		<script src="/scripts/dashboard.js"></script>
+		<script src="https://maps.google.com/maps/api/js?key=AIzaSyC1JGhGevrLvdWjHDKVJXG436XUOHwOEGA" type="text/javascript"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+		<!-- Latest compiled and minified JavaScript -->
+		<script async type="text/javascript">
+			// On initialise la latitude et la longitude
+			<% if (locals.hotelInfo && locals.hotelInfo.latitude && locals.hotelInfo.longitude) { %>
+			var lat = <%= hotelInfo.latitude %>;
+			var lon = <%= hotelInfo.longitude %>;
+			<% } else{%>
+			var lat = 36.0996987;
+			var lon = -341.8203554;
+			<% }%>
+			var map = null;
+			// Fonction d'initialisation de la carte
+			function initMap() {
+				// Créer l'objet "map" et l'insèrer dans l'élément HTML qui a l'ID "map"
+				map = new google.maps.Map(document.getElementById("map"), {
+					center: {lat: 36.0996987, lng: -341.8203554},
+					zoom: 1,
+					styles: [
+					{elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+					{elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+					{elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+					{
+						featureType: 'administrative.locality',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#d59563'}]
+					},
+					{
+						featureType: 'poi',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#d59563'}]
+					},
+					{
+						featureType: 'poi.park',
+						elementType: 'geometry',
+						stylers: [{color: '#263c3f'}]
+					},
+					{
+						featureType: 'poi.park',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#6b9a76'}]
+					},
+					{
+						featureType: 'road',
+						elementType: 'geometry',
+						stylers: [{color: '#38414e'}]
+					},
+					{
+						featureType: 'road',
+						elementType: 'geometry.stroke',
+						stylers: [{color: '#212a37'}]
+					},
+					{
+						featureType: 'road',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#9ca5b3'}]
+					},
+					{
+						featureType: 'road.highway',
+						elementType: 'geometry',
+						stylers: [{color: '#746855'}]
+					},
+					{
+						featureType: 'road.highway',
+						elementType: 'geometry.stroke',
+						stylers: [{color: '#1f2835'}]
+					},
+					{
+						featureType: 'road.highway',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#f3d19c'}]
+					},
+					{
+						featureType: 'transit',
+						elementType: 'geometry',
+						stylers: [{color: '#2f3948'}]
+					},
+					{
+						featureType: 'transit.station',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#d59563'}]
+					},
+					{
+						featureType: 'water',
+						elementType: 'geometry',
+						stylers: [{color: '#17263c'}]
+					},
+					{
+						featureType: 'water',
+						elementType: 'labels.text.fill',
+						stylers: [{color: '#515c6d'}]
+					},
+					{
+						featureType: 'water',
+						elementType: 'labels.text.stroke',
+						stylers: [{color: '#17263c'}]
+					}
+					]
+				});
+				
+				// Nous ajoutons un marqueur pour le centre de la zone europe du sud
+				var marker = new google.maps.Marker({
+					// Nous définissons sa position (syntaxe json)
+					position: {lat: lat, lng: lon},
+					// Nous définissons à quelle carte il est ajouté
+					map: map
+				});
+				
+				<!-- Dessiner des zones de couleurs -->
+				
+				//sommets du polygone
+				var southEuropePolygone = [
+				<!-- new google.maps.LatLng(48.858859 , 2.3470599), // Paris -->
+				
+				new google.maps.LatLng(52.9584849, 4.8925826),
+				new google.maps.LatLng(48.2822846, -4.8632768),
+				new google.maps.LatLng(43.1351761, -1.5234330),
+				new google.maps.LatLng(43.2632427, -9.4335893),
+				new google.maps.LatLng(36.8857140, -9.2578080),
+				new google.maps.LatLng(36.8857140, -1.3476518),
+				new google.maps.LatLng(43.1992430, 4.3652388),
+				new google.maps.LatLng(43.1351761, 7.3535201),
+				new google.maps.LatLng(38.7589554, 8.1445357),
+				new google.maps.LatLng(36.4630079, 15.7031295),
+				new google.maps.LatLng(40.1156905, 18.8671920),
+				new google.maps.LatLng(45.3992021, 12.6269576),
+				new google.maps.LatLng(53.0113667, 5.3320357),
+				
+				];
+				
+				//sommets du polygone
+				var northAmericaPolygone = [
+				<!-- new google.maps.LatLng(48.858859 , 2.3470599), // Paris -->
+				
+				new google.maps.LatLng(9.6856554, -77.3437929),
+				new google.maps.LatLng(69.1048637, -19.6875429),
+				new google.maps.LatLng(83.4173764, -16.8750429),
+				new google.maps.LatLng(83.1712357, -81.5625429),
+				new google.maps.LatLng(66.7294397, -165.9375429),
+				new google.maps.LatLng(56.4790861, -156.7969179),
+				new google.maps.LatLng(59.81390640, -143.4375429),
+				new google.maps.LatLng(18.5354359, -107.5781679),
+				new google.maps.LatLng(8.2975241, -78.7500429),
+				];
+				
+				//sommets du polygone
+				var southAmericaPolygone = [
+				
+				new google.maps.LatLng(16.6073155, -72.4804705),
+				new google.maps.LatLng(-7.2042027, -30.1171893),
+				new google.maps.LatLng(-60.1602103, -70.8984447),
+				new google.maps.LatLng(-6.1960367, -83.5546947),
+				new google.maps.LatLng(16.4015135, -73.3593822),
+				];
+				
+				//sommets du polygone
+				var northEuropePolygone = [
+				
+				new google.maps.LatLng(53.6606400, -13.3593750),
+				new google.maps.LatLng(78.0960346, 104.7656250),
+				new google.maps.LatLng(65.4455700, 190.5468750),
+				new google.maps.LatLng(44.7403207, 16.5234375),
+				new google.maps.LatLng(52.3928223, -13.3593750),
+				];
+				
+				//sommets du polygone
+				var pacificPolygone = [
+
+				new google.maps.LatLng(-9.7350582, 180.0000000),
+				new google.maps.LatLng(-11.1172551, 106.8750000),
+				new google.maps.LatLng(-50.4563340, 111.7968750),
+				new google.maps.LatLng(-49.3245858, 183.1640625),
+				new google.maps.LatLng(-11.1172551, 181.4062500),
+				
+				];
+				
+				//sommets du polygone
+				var imeaPolygone = [
+
+				new google.maps.LatLng(35.6787841, -18.7500036),
+				new google.maps.LatLng(-43.6044881, 24.8437464),
+				new google.maps.LatLng(26.0469008, 93.0468714),
+				new google.maps.LatLng(35.6787841, -18.0468786),
+				];
+				
+				//sommets du polygone
+				var seaPolygone = [
+
+				new google.maps.LatLng(32.1814635, 78.6328089),
+				new google.maps.LatLng(4.5017483, 99.0234339),
+				new google.maps.LatLng(42.7464237, 152.4609339),
+				new google.maps.LatLng(33.6561177, 78.6328089),
+				];
+				
+				//sommets du polygone
+				var chinaPolygone = [
+
+				new google.maps.LatLng(56.5404597, 73.0078197),
+				new google.maps.LatLng(29.8295496, 66.6796947),
+				new google.maps.LatLng(33.7115066, 126.0937572),
+				new google.maps.LatLng(56.3462424, 137.3437572),
+				new google.maps.LatLng(56.3462424, 74.0625072),
+				];
+				
+				se = new google.maps.Polygon({
+					paths: southEuropePolygone, // sommets du polygone
+					strokeColor: "#0d6efd", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#0d6efd", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "south Europe"
+				});
+				
+				na = new google.maps.Polygon({
+					paths: northAmericaPolygone, // sommets du polygone
+					strokeColor: "#dc3545", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#dc3545", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "North America"
+				});
+				
+				sa = new google.maps.Polygon({
+					paths: southAmericaPolygone, // sommets du polygone
+					strokeColor: "#fd7e14", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#fd7e14", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "South America"
+				});
+				
+				ne = new google.maps.Polygon({
+					paths: northEuropePolygone, // sommets du polygone
+					strokeColor: "#6610f2", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#6610f2", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "North Europe"
+				});
+				
+				imea = new google.maps.Polygon({
+					paths: imeaPolygone, // sommets du polygone
+					strokeColor: "#ffc107", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#ffc107", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "IMEA"
+				});
+				
+				china = new google.maps.Polygon({
+					paths: chinaPolygone, // sommets du polygone
+					strokeColor: "#f8f9fa", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#f8f9fa", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "China"
+				});
+				
+				pacific = new google.maps.Polygon({
+					paths: pacificPolygone, // sommets du polygone
+					strokeColor: "#0dcaf0", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#0dcaf0", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "Pacific"
+				});
+				
+				sea = new google.maps.Polygon({
+					paths: seaPolygone, // sommets du polygone
+					strokeColor: "#198754", // couleur des bords du	polygone
+					strokeOpacity: 0.8, // opacité des bords du	polygone
+					strokeWeight: 2, // épaisseur des bords du	polygone
+					fillColor: "#198754", // couleur de remplissage du	polygone
+					fillOpacity: 0.2, // opacité de remplissage du	polygone
+					title: "SEA"
+				});
+				
+				//lier le polygone à la carte
+				//ceci permet au polygone d'être affiché sur la carte
+				se.setMap(map);
+				ne.setMap(map);
+				na.setMap(map);
+				sa.setMap(map);
+				sea.setMap(map);
+				china.setMap(map);
+				imea.setMap(map);
+				pacific.setMap(map);
+				
+			}
+			window.onload = function(){
+				// Fonction d'initialisation qui s'exécute lorsque le DOM est chargé
+				initMap(); 
+				
+				
+			};
+		</script>
+	</body>
+</html>		
