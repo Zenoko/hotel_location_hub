@@ -35,7 +35,42 @@ let options = {
 
 app.get("/", (req, res) => {
 	
-	res.render("accueil.ejs");
+	hotels = [];
+	
+	let southEuropeCountry = ["FR","PT","ES","IT","GR","AD","GF","IL","MT","MC","RE"];
+	let northEuropeCountry = ["GB","DE","BE","AT","PL","RU","CH","SE","UA","RO","NL","LU","CZ","KZ","HU","AL","AM","AZ","BY","BA","BG","HR","DK","EE","GE","IE","KG","LV","LT","MD","MK","RS","SK","SI"];
+	let northAmericaCountry = ["US","CA","MX","BS","BB","BM","CR","CU","PA","PR"];
+	let southAmericaCountry = ["AR","BR","CO","CL","PY","PE","UY","BO","EC",""];
+	let southEastAsiaCountry = ["VN","TH","KH","ID","JP","MY","SG","MM","KR","LA","MV","PH","TW"];
+	let chinaCountry = ["CN","HK","MN","MO"];
+	let pacificCountry = ["AU","FJ","NZ","PF"];
+	let imeaCountry = ["TR","AE","DZ","CD","IN","MA","TN","ZA","SA","JO","EG","BH","BJ","BW","CM","GQ","GH","CI","KE","SH","KW","LB","MG","MU","NA","NG","OM","PK","QA","RW","SN","SC","LK","TZ","ZM"];
+	
+	// Code pour récupérer l'ensemble des hôtels existants 
+	url="http://repos.accor.com/ota/content.xml";
+	let HotelCodeXML = http.get(url, function(res2) {
+		let data = '';
+		res2.on('data', function(stream) {
+			data += stream;
+		});
+		res2.on('end', function(){
+			parser.parseString(data, function(error, result) {
+				if(error === null) {
+					
+					result.repositoryContent.hotels[0].hotel.forEach((hotel) => {
+						// console.log(hotel.hotelCode[0]);
+						hotels.push(hotel);
+					});
+					console.log(hotels.length);
+					res.render("find_hub_hotel.ejs", { hotels: hotels, imeaCountry: imeaCountry,pacificCountry:pacificCountry,chinaCountry:chinaCountry, southEastAsiaCountry:southEastAsiaCountry, northEuropeCountry:northEuropeCountry, southEuropeCountry: southEuropeCountry, northAmericaCountry: northAmericaCountry, southAmericaCountry: southAmericaCountry });
+				}
+				else {
+					console.log(error);
+				}
+				
+			});
+		});
+	});
 });
 
 
